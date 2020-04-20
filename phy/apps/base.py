@@ -1538,12 +1538,26 @@ class BaseController(object):
 
     def create_ipython_view(self):
         """Create an IPython View."""
+        import pkgutil
+        phyloader = pkgutil.get_loader('phy')
+        ext_path = (phyloader.path[0:-19])
         view = IPythonView()
         view.start_kernel()
         view.inject(
             controller=self, c=self, m=self.model, s=self.supervisor,
             emit=emit, connect=connect,
         )
+
+        @connect(sender=self.supervisor)
+        def on_outlier(sender):
+            view.kernel.shell.run_cell(raw_cell="%run -i "+ext_path+"outlier.py")
+            return
+
+        @connect(sender=self.supervisor)
+        def on_splitter(sender):
+            view.kernel.shell.run_cell(raw_cell="%run -i "+ext_path+"splitter.py")
+            return
+
         return view
 
     # GUI

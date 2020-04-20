@@ -400,6 +400,9 @@ class ActionCreator(object):
 
         'label': 'l',
 
+        'launch_outlier' : '1',
+        'launch_splitter' : '2',
+
         # Move.
         'move_best_to_noise': 'alt+n',
         'move_best_to_mua': 'alt+m',
@@ -440,6 +443,8 @@ class ActionCreator(object):
         'select': 'c',
         'filter': 'f',
         'sort': 's',
+        'launch_outlier' : '1',
+        'launch_splitter' : '2',
     }
 
     def __init__(self, supervisor=None):
@@ -484,9 +489,7 @@ class ActionCreator(object):
         # Clustering.
         self.add(w, 'merge', set_busy=True, icon='f247')
         self.add(w, 'split', set_busy=True)
-        self.edit_actions.separator()
-
-        # Move.
+        self.edit_actions.separator()        # Move.
         self.add(w, 'move', prompt=True, n_args=2)
         for which in ('best', 'similar', 'all'):
             for group in ('noise', 'mua', 'good', 'unsorted'):
@@ -497,7 +500,10 @@ class ActionCreator(object):
                     submenu='Move %s to' % which,
                     docstring='Move %s to %s.' % (which, group))
         self.edit_actions.separator()
-
+       # Shortcuts to launch outlier rejection / splitter plugins
+        self.add(w, 'launch_outlier', set_busy=True)
+        self.add(w, 'launch_splitter', set_busy=True)
+        self.edit_actions.separator()
         # Label.
         self.add(w, 'label', prompt=True, n_args=2)
         self.edit_actions.separator()
@@ -1173,3 +1179,12 @@ class Supervisor(object):
         _block(lambda: self.task_logger.has_finished() and not self._is_busy)
         assert not self._is_busy
         _wait(50)
+
+    def launch_cue(self):
+        emit('cue',self)
+
+    def launch_outlier(self):
+        emit('outlier',self)
+
+    def launch_splitter(self):
+        emit('splitter',self)
