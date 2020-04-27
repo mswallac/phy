@@ -1,0 +1,3 @@
+[console_scripts]
+phy = phy.apps:phycli
+
